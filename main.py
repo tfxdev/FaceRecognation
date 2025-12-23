@@ -1,5 +1,7 @@
 import cv2 as cv
 import face_recognition
+import sys
+import os
 
 def capture_webcam_image():
     capture = cv.VideoCapture(0)
@@ -39,9 +41,41 @@ def processed_captured_image():
     return captured_img_encoding
 
 def compare(base_image_url):
+    print(base_image_url)
     result = face_recognition.compare_faces([base_image(base_image_url)], processed_captured_image())
     print("Result", result)
+    cv.waitKey(0)
+    sys.exit()
+    
 
-compare("photos/Toufic.jpg")
+def ask_user_for_choosing_file():
+    image_files = os.listdir("./photos")
 
-cv.waitKey(0)
+    if len(image_files) > 0:
+        print("\nAvailable images are listed bellow: \n")
+        count = 1
+        for i in image_files:
+            print(count,"::", i, end="\n")
+            count += 1
+        
+        while True:
+            try:
+                base_image_num_input = int(input(f"\nType the image number between [1:{count-1}]:"))
+                if base_image_num_input > 0 and base_image_num_input < count:
+                    break
+            except:
+                print(f"Only numbers between [1:{count-1}] are allowed!\n")
+                continue
+            
+        base_image_number = base_image_num_input - 1
+        print(base_image_number)
+        return "./photos/" + image_files[base_image_number]
+
+
+if __name__ == "__main__":
+    try:
+        compare(ask_user_for_choosing_file())
+    except Exception as e:
+        print(f"Something not right! {e}")
+
+
